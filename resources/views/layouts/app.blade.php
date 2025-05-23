@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
@@ -35,6 +36,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('coupons.index') }}">Cupons</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('cart.index') }}">Carrinho</a>
                         </li>
                     </ul>
                 </div>

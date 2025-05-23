@@ -1,5 +1,6 @@
 @php
-    use App\Models\ProductVariation;use Illuminate\Support\Str; @endphp
+    use App\Models\ProductVariation;
+@endphp
 @extends('layouts.app')
 
 @section('content')
@@ -35,8 +36,11 @@
                         <td>{{ !!$productVariation->stock ? $productVariation->stock->quantity : ''}}</td>
                         <td class="text-center">
                             <div class="btn-group">
-                                <a class="btn btn-outline-secondary" href="{{ route('product-variations.edit', $productVariation->uuid) }}"><i class="bi bi-pencil"></i></a>
-                                <a class="btn btn-outline-secondary" href="{{ route('product-variations.show', $productVariation->uuid) }}">
+                                <a class="btn btn-outline-secondary"
+                                   href="{{ route('product-variations.edit', $productVariation->uuid) }}"><i
+                                            class="bi bi-pencil"></i></a>
+                                <a class="btn btn-outline-secondary"
+                                   href="{{ route('product-variations.show', $productVariation->uuid) }}">
                                     <i class="bi bi-eye"></i>
                                 </a>
                                 <button type="button"

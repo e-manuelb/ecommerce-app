@@ -1,8 +1,9 @@
 <?php
 
-use App\Http\Controllers\general\CouponController;
-use App\Http\Controllers\product\ProductController;
-use App\Http\Controllers\product\ProductVariationController;
+use App\Http\Controllers\General\CartController;
+use App\Http\Controllers\General\CouponController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Product\ProductVariationController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::prefix('products')->group(function () {
     Route::get('/{uuid}', [ProductController::class, 'show'])->name('products.show');
     Route::put('/{uuid}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/{uuid}', [ProductController::class, 'destroy'])->name('products.destroy');
+    Route::post('/add-to-cart/{uuid}', [ProductController::class, 'addToCart'])->name('products.add-to-cart');
 });
 
 Route::prefix('product-variations')->group(function () {
@@ -34,4 +36,11 @@ Route::prefix('product-variations')->group(function () {
     Route::get('/{uuid}', [ProductVariationController::class, 'show'])->name('product-variations.show');
     Route::put('/{uuid}', [ProductVariationController::class, 'update'])->name('product-variations.update');
     Route::delete('/{uuid}', [ProductVariationController::class, 'destroy'])->name('product-variations.destroy');
+    Route::post('/add-to-cart/{uuid}', [ProductVariationController::class, 'addToCart'])->name('product-variations.add-to-cart');
+});
+
+Route::prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('cart.index');
+    Route::delete('/{uuid}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::put('/', [CartController::class, 'update'])->name('cart.update');
 });

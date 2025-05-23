@@ -1,4 +1,4 @@
-@php use App\Models\Coupon;use Illuminate\Support\Str; @endphp
+@php use App\Models\Coupon;use App\Utils\CurrencyUtil;use Illuminate\Support\Str; @endphp
 @extends('layouts.app')
 
 @section('content')
@@ -13,7 +13,6 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th scope="col">ID</th>
                     <th scope="col">Código</th>
                     <th scope="col">Desconto</th>
                     <th scope="col">Tipo de Desconto</th>
@@ -23,14 +22,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <?php /** @var Coupon[] $coupons */?>
+                <?php /** @var Coupon[] $coupons */ ?>
                 @foreach($coupons as $coupon)
                     <tr>
-                        <td>{{ $coupon->id }}</td>
                         <td>{{ Str::limit($coupon->code, 30) }}</td>
                         <td>{{ Coupon::formatByDiscountType($coupon->discount, $coupon->discount_type) }}</td>
                         <td>{{ $coupon->discount_type  }}</td>
-                        <td>{{ (new NumberFormatter('pt_BR',  NumberFormatter::CURRENCY))->format($coupon->min_subtotal_to_apply, NumberFormatter::TYPE_DEFAULT) }}</td>
+                        <td>{{ CurrencyUtil::formatBRL($coupon->min_subtotal_to_apply) }}</td>
                         <td>{{ !!$coupon->active ? "Sim" : "Não" }}</td>
                         <td>{{ $coupon->expires_at }}</td>
                     </tr>

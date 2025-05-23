@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Constants\DiscountTypes;
+use App\Constants\DiscountType;
 use App\Models\Coupon;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;

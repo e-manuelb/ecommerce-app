@@ -2,7 +2,7 @@
 
 namespace App\Constants;
 
-class DiscountTypes
+class DiscountType
 {
     public const AMOUNT = 'AMOUNT';
     public const PERCENTAGE = 'PERCENTAGE';

@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Constants\DiscountTypes;
+use App\Constants\DiscountType;
 use App\Models\Coupon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -22,7 +22,7 @@ class CouponFactory extends Factory
             'uuid' => Str::uuid()->toString(),
             'code' => Str::random(10),
             'discount' => $this->faker->randomFloat(2, 0, 100),
-            'discount_type' => $this->faker->randomElement(DiscountTypes::ALL),
+            'discount_type' => $this->faker->randomElement(DiscountType::ALL),
             'min_subtotal_to_apply' => $this->faker->randomFloat(2, 0, 100),
             'expires_at' => $this->faker->dateTimeBetween('-1 year'),
             'active' => $this->faker->boolean,

@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Requests\product;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CreateProductVariationRequest extends FormRequest
+class CreateProductRequest extends FormRequest
 {
     public function rules(): array
     {
         return [
-            'product_id' => ['required', 'integer', 'exists:products,id'],
             'name' => ['required', 'string', 'max:255'],
-            'sku' => ['required', 'string', 'max:255', 'unique:product_variations,sku'],
-            'description' => ['required', 'string'],
+            'sku' => ['required', 'string', 'max:255', 'unique:products,sku'],
+            'description' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric'],
             'quantity' => ['required', 'numeric']
         ];
@@ -24,9 +23,6 @@ class CreateProductVariationRequest extends FormRequest
             'name.required' => 'O campo nome é obrigatório.',
             'name.string' => 'O campo nome deve ser uma sequência de caracteres.',
             'name.max' => 'O campo nome não pode ter mais que 255 caracteres.',
-
-            'product_id.required' => 'O campo ID do Produto é obrigatório',
-            'product_id.integer' => 'O campo ID do Produto deve ser um número inteiro.',
 
             'sku.required' => 'O campo SKU é obrigatório.',
             'sku.string' => 'O campo SKU deve ser uma sequência de caracteres.',

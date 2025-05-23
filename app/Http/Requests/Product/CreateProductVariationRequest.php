@@ -1,22 +1,18 @@
 <?php
 
-namespace App\Http\Requests\product;
+namespace App\Http\Requests\Product;
 
-use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateProductRequest extends FormRequest
+class CreateProductVariationRequest extends FormRequest
 {
     public function rules(): array
     {
-        /** @var Product $product */
-        $product = Product::query()->where('uuid', $this->route('uuid'))->first();
-
         return [
+            'product_id' => ['required', 'integer', 'exists:products,id'],
             'name' => ['required', 'string', 'max:255'],
-            'sku' => ['required', 'string', 'max:255', Rule::unique('products', 'sku')->ignore($product->uuid, 'uuid')],
-            'description' => ['required', 'string', 'max:255'],
+            'sku' => ['required', 'string', 'max:255', 'unique:product_variations,sku'],
+            'description' => ['required', 'string'],
             'price' => ['required', 'numeric'],
             'quantity' => ['required', 'numeric']
         ];
@@ -28,6 +24,9 @@ class UpdateProductRequest extends FormRequest
             'name.required' => 'O campo nome é obrigatório.',
             'name.string' => 'O campo nome deve ser uma sequência de caracteres.',
             'name.max' => 'O campo nome não pode ter mais que 255 caracteres.',
+
+            'product_id.required' => 'O campo ID do Produto é obrigatório',
+            'product_id.integer' => 'O campo ID do Produto deve ser um número inteiro.',
 
             'sku.required' => 'O campo SKU é obrigatório.',
             'sku.string' => 'O campo SKU deve ser uma sequência de caracteres.',

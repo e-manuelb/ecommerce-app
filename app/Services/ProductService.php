@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Constants\ProductTypes;
-use App\Http\Requests\product\CreateProductRequest;
-use App\Http\Requests\product\UpdateProductRequest;
+use App\Constants\ProductType;
+use App\Http\Requests\Product\CreateProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -33,7 +33,7 @@ readonly class ProductService
 
         if ($request->has('quantity') && $request->input('quantity') > 0) {
             $this->stockService->create([
-                'product_type' => ProductTypes::PRODUCT,
+                'product_type' => ProductType::PRODUCT,
                 'product_reference_uuid' => $product->uuid,
                 'quantity' => $request->input('quantity'),
             ]);
@@ -60,7 +60,13 @@ readonly class ProductService
 
         $stock = $product->stock;
 
-        if ($stock != null && $request->input('quantity') > 0) {
+        if ($stock == null) {
+            $this->stockService->create([
+                'product_type' => ProductType::PRODUCT,
+                'product_reference_uuid' => $product->uuid,
+                'quantity' => $request->input('quantity')
+            ]);
+        } else {
             $stock->update([
                 'quantity' => $request->input('quantity')
             ]);

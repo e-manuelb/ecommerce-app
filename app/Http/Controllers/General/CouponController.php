@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\general;
+namespace App\Http\Controllers\General;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\general\coupon\CreateCouponRequest;

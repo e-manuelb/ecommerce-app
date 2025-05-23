@@ -2,7 +2,7 @@
 
 namespace App\Constants;
 
-class ProductTypes
+class ProductType
 {
     public const PRODUCT = 'NORMAL';
     public const PRODUCT_VARIATION = 'VARIATION';

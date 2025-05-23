@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Stock;
 
-class StockService
+readonly class StockService
 {
     public function create(array $data): Stock
     {

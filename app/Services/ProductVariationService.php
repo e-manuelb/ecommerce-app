@@ -2,15 +2,21 @@
 
 namespace App\Services;
 
-use App\Constants\ProductTypes;
-use App\Http\Requests\product\CreateProductVariationRequest;
-use App\Http\Requests\product\UpdateProductVariationRequest;
+use App\Constants\ProductType;
+use App\Http\Requests\Product\CreateProductVariationRequest;
+use App\Http\Requests\Product\UpdateProductVariationRequest;
 use App\Models\ProductVariation;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 readonly class ProductVariationService
 {
     public StockService $stockService;
+
+    public function __construct(StockService $stockService)
+    {
+        $this->stockService = $stockService;
+    }
+
 
     public function paginate(): LengthAwarePaginator
     {
@@ -33,7 +39,7 @@ readonly class ProductVariationService
 
         if ($request->has('quantity') && $request->input('quantity') > 0) {
             $this->stockService->create([
-                'product_type' => ProductTypes::PRODUCT_VARIATION,
+                'product_type' => ProductType::PRODUCT_VARIATION,
                 'product_reference_uuid' => $product->uuid,
                 'quantity' => $request->input('quantity'),
             ]);
@@ -54,9 +60,20 @@ readonly class ProductVariationService
         $productVariation->update($request->validated());
 
         if ($request->has('quantity') && $request->input('quantity') > 0) {
-            $productVariation->stock->update([
-                'quantity' => $request->input('quantity')
-            ]);
+
+            $stock = $productVariation->stock;
+
+            if ($stock == null) {
+                $this->stockService->create([
+                    'product_type' => ProductType::PRODUCT_VARIATION,
+                    'product_reference_uuid' => $productVariation->uuid,
+                    'quantity' => $request->input('quantity')
+                ]);
+            } else {
+                $stock->update([
+                    'quantity' => $request->input('quantity')
+                ]);
+            }
         }
 
         return $productVariation;

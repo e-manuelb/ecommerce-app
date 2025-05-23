@@ -1,24 +1,29 @@
 <?php
 
-namespace App\Http\Controllers\product;
+namespace App\Http\Controllers\Product;
 
+use App\Constants\ProductType;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\product\CreateProductRequest;
-use App\Http\Requests\product\UpdateProductRequest;
+use App\Http\Requests\Product\CreateProductRequest;
+use App\Http\Requests\Product\UpdateProductRequest;
+use App\Services\CartService;
 use App\Services\ProductService;
 use App\Services\StockService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ProductController extends Controller
 {
     public readonly ProductService $productService;
     public readonly StockService $stockService;
+    public readonly CartService $cartService;
 
-    public function __construct(ProductService $productService, StockService $stockService)
+    public function __construct(ProductService $productService, StockService $stockService, CartService $cartService)
     {
         $this->productService = $productService;
         $this->stockService = $stockService;
+        $this->cartService = $cartService;
     }
 
     public function index(): View
@@ -45,6 +50,13 @@ class ProductController extends Controller
     public function create(): View
     {
         return view('products.form');
+    }
+
+    public function addToCart(String $uuid): RedirectResponse
+    {
+        $this->cartService->add($uuid, ProductType::PRODUCT, 1);
+
+        return back()->with('success', 'Produto adicionado ao carrinho com sucesso!');
     }
 
     public function store(CreateProductRequest $request): RedirectResponse

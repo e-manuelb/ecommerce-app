@@ -1,4 +1,4 @@
-@php use App\Constants\DiscountTypes; @endphp
+@php use App\Constants\DiscountType; @endphp
 @extends('layouts.app')
 
 @section('content')
@@ -18,12 +18,13 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="discount" class="form-label">Desconto</label>
-                    <input type="number" step="any" min="0" max="100" name="discount" class="form-control" id="discount" value="{{ old('discount') }}" required>
+                    <input type="number" step="any" min="0" max="100" name="discount" class="form-control" id="discount"
+                           value="{{ old('discount') }}" required>
                 </div>
                 <div class="col">
                     <label for="discount_type" class="form-label">Tipo de Desconto</label>
                     <select name="discount_type" class="form-select" id="discount_type" required>
-                        @foreach(DiscountTypes::ALL as $discountType)
+                        @foreach(DiscountType::ALL as $discountType)
                             <option value="{{ $discountType }}" label="{{ $discountType }}"></option>
                         @endforeach
                     </select>

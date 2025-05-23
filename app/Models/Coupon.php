@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Constants\DiscountTypes;
+use App\Constants\DiscountType;
 use App\Traits\HasUUID;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,8 +39,8 @@ class Coupon extends Model
     public static function formatByDiscountType(float $discount, string $type): string
     {
         return match ($type) {
-            DiscountTypes::AMOUNT => (new NumberFormatter('pt_BR', NumberFormatter::CURRENCY))->format($discount, NumberFormatter::TYPE_DEFAULT),
-            DiscountTypes::PERCENTAGE => $discount . '%',
+            DiscountType::AMOUNT => (new NumberFormatter('pt_BR', NumberFormatter::CURRENCY))->format($discount, NumberFormatter::TYPE_DEFAULT),
+            DiscountType::PERCENTAGE => $discount . '%',
             default => $discount,
         };
     }
