@@ -19,9 +19,19 @@ readonly class CartService
 
     public function all(): Collection
     {
-        return collect(
-            Session::get($this->key, [])
-        );
+        $items = collect(Session::get('cart.items'));
+
+        return $items->filter(function ($item) {
+            if ($item['product_type'] == ProductType::PRODUCT) {
+                return Product::query()->where('uuid', $item['uuid'])->exists();
+            }
+
+            if ($item['product_type'] == ProductType::PRODUCT_VARIATION) {
+                return ProductVariation::query()->where('uuid', $item['uuid'])->exists();
+            }
+
+            return true;
+        });
     }
 
     public function add(String $uuid, String $type, int $quantity = 1): void
@@ -77,5 +87,16 @@ readonly class CartService
     public function total(): float
     {
         return $this->all()->sum(fn($item) => $item['price'] * $item['quantity']);
+    }
+
+    public function getCurrentQuantityByProduct(String $uuid): int
+    {
+        $current = $this->all()->firstWhere('uuid', $uuid);
+
+        if (!isset($current)) {
+            return 0;
+        }
+
+        return $current['quantity'];
     }
 }

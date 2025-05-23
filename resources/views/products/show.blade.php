@@ -1,14 +1,23 @@
 @php
     use App\Models\Product;
-    use App\Utils\CurrencyUtil;
+    use App\Services\CartService;use App\Utils\CurrencyUtil;
 @endphp
 @extends('layouts.app')
 
+@php
+    $cartService = new CartService();
+@endphp
+
 @section('content')
     <?php /** @var Product $product */ ?>
+    <?php $currentQuantity = $cartService->getCurrentQuantityByProduct($product->uuid); ?>
+    <?php $stockQuantity = $product->stock ? $product->stock->quantity : 0; ?>
+    <?php $canSeeCart = $currentQuantity != $stockQuantity && $currentQuantity < $stockQuantity && $stockQuantity != 0 ?>
+
     <div class="container border p-3 bg-body-tertiary">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <p class="h2">Informações</p>
+            <?php if ($canSeeCart): ?>
             <button type="button" class="btn btn-success btn-lg add-to-cart-product-button"
                     data-id="{{ $product->uuid }}">
                 <i class="bi bi-cart"></i>
@@ -21,23 +30,25 @@
                 @csrf
                 @method('POST')
             </form>
+            <?php endif; ?>
         </div>
         <hr>
         <div>
-            <dt class="col-sm-3">Produto</dt>
-            <dd class="col-sm-9">{{ $product->name }}</dd>
+            <dt class="col-sm-3"> Produto</dt>
+            <dd class="col-sm-9"> {{ $product->name }}</dd>
 
-            <dt class="col-sm-3">SKU</dt>
-            <dd class="col-sm-9">{{ $product->sku }}</dd>
+            <dt class="col-sm-3"> SKU</dt>
+            <dd class="col-sm-9">{{ $product->sku }}
+            </dd>
 
-            <dt class="col-sm-3">Descrição</dt>
+            <dt class="col-sm-3"> Descrição</dt>
             <dd class="col-sm-9">{{ $product->description }}</dd>
 
-            <dt class="col-sm-3">Preço</dt>
+            <dt class="col-sm-3"> Preço</dt>
             <dd class="col-sm-9">{{ CurrencyUtil::formatBRL($product->price) }}</dd>
 
-            <dt class="col-sm-3">Estoque</dt>
-            <dd class="col-sm-9">{{ !!$product->stock ? $product->stock->quantity : 0}}</dd>
+            <dt class="col-sm-3"> Estoque</dt>
+            <dd class="col-sm-9">{{ !!$product->stock ? $product->stock->quantity : 0 }}</dd>
 
             <?php if (count($product->productVariations)): ?>
             <hr>
@@ -54,20 +65,26 @@
                         <p class="text">
                             {{ $productVariation->description }}
                         </p>
-                        <div class="text-end">
-                            <button type="button" class="btn btn-success btn-lg add-to-cart-product-variation-button"
-                                    data-id="{{ $productVariation->uuid }}">
-                                <i class="bi bi-cart"></i>
-                            </button>
+                            <?php $currentQuantity = $cartService->getCurrentQuantityByProduct($productVariation->uuid); ?>
+                            <?php $stockQuantity = $productVariation->stock ? $productVariation->stock->quantity : 0; ?>
+                            <?php $canSeeCart = $currentQuantity < $stockQuantity && $stockQuantity != 0 ?>
 
-                            <form id="add-product-variation-to-cart-{{ $productVariation->uuid }}"
-                                  action="{{ route('product-variations.add-to-cart', $productVariation->uuid) }}"
-                                  method="POST"
-                                  style="display: none;">
-                                @csrf
-                                @method('POST')
-                            </form>
-                        </div>
+                            <?php if ($canSeeCart): ?>
+                                <div class="text-end">
+                                    <button type="button" class="btn btn-success btn-lg add-to-cart-product-variation-button"
+                                            data-id="{{ $productVariation->uuid }}">
+                                        <i class="bi bi-cart"></i>
+                                    </button>
+
+                                    <form id="add-product-variation-to-cart-{{ $productVariation->uuid }}"
+                                          action="{{ route('product-variations.add-to-cart', $productVariation->uuid) }}"
+                                          method="POST"
+                                          style="display: none;">
+                                        @csrf
+                                        @method('POST')
+                                    </form>
+                                </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             @endforeach

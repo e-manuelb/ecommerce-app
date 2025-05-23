@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\General\CartController;
 use App\Http\Controllers\General\CouponController;
+use App\Http\Controllers\Order\OrderController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\ProductVariationController;
 use App\Models\Product;
@@ -43,4 +44,9 @@ Route::prefix('cart')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('cart.index');
     Route::delete('/{uuid}', [CartController::class, 'remove'])->name('cart.remove');
     Route::put('/', [CartController::class, 'update'])->name('cart.update');
+});
+
+Route::prefix('orders')->group(function () {
+    Route::get('/confirm-order', [OrderController::class, 'confirmOrder'])->name('orders.confirm-order');
+    Route::post('/', [OrderController::class, 'store'])->name('orders.store');
 });

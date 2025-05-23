@@ -106,7 +106,7 @@
                                     {{ CurrencyUtil::formatBRL($shippingPrice + $subtotal) }}
                                 </p>
                                 <form id="createOrder">
-                                    <button type="submit" class="btn btn-primary">Finalizar compra</button>
+                                    <a href="{{ route('orders.confirm-order') }}" class="btn btn-primary">Finalizar compra</a>
                                 </form>
                             </div>
                         </div>
