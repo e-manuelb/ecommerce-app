@@ -13,6 +13,8 @@ Route::prefix('coupons')->group(function () {
 
     Route::get('/create', fn() => view('coupons.form'))->name('coupons.create');
     Route::post('/', [CouponController::class, 'store'])->name('coupons.store');
+
+    Route::post('/validate', [CouponController::class, 'validate'])->name('coupons.validate');
 });
 
 Route::prefix('products')->group(function () {

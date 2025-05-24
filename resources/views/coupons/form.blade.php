@@ -18,16 +18,20 @@
             <div class="row mb-3">
                 <div class="col">
                     <label for="discount" class="form-label">Desconto</label>
-                    <input type="number" step="any" min="0" max="100" name="discount" class="form-control" id="discount"
+                    <input type="number" step="any" min="0" name="discount" class="form-control" id="discount"
                            value="{{ old('discount') }}" required>
                 </div>
                 <div class="col">
                     <label for="discount_type" class="form-label">Tipo de Desconto</label>
                     <select name="discount_type" class="form-select" id="discount_type" required>
                         @foreach(DiscountType::ALL as $discountType)
-                            <option value="{{ $discountType }}" label="{{ $discountType }}"></option>
+                            <option value="{{ $discountType }}" label="{{ DiscountType::translate($discountType) }}"></option>
                         @endforeach
                     </select>
+                </div>
+                <div class="col">
+                    <label for="min_value_to_apply" class="form-label">Valor mínimo para aplicar desconto</label>
+                    <input type="number" step="any" min="0" name="min_value_to_apply" class="form-control" id="min_value_to_apply" value="{{ old('min_value_to_apply') }}" required>
                 </div>
             </div>
             <div class="mb-3">
@@ -40,3 +44,20 @@
         </form>
     </div>
 @endsection
+<script>
+    const discountInput = document.getElementById('discount');
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const discountType = document.getElementById('discount_type');
+
+        console.log(discountInput, discountType)
+
+        discountType.onchange = () => {
+            if (discountType.value === 'AMOUNT') {
+                discountInput.setAttribute('max', 100);
+            } else {
+                discountInput.removeAttribute('max');
+            }
+        };
+    });
+</script>

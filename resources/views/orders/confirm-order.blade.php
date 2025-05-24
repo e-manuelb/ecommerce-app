@@ -43,57 +43,71 @@
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Endereço</h6>
+                <form>
+                    <div class="row mb-3">
+                        <div class="col-4">
+                            <label class="form-label" for="cep">CEP</label>
+                            <input
+                                class="form-control"
+                                type="text"
+                                placeholder="Digite seu CEP (somente números)"
+                                id="cep"
+                                maxlength="8"
+                                required
+                                pattern="[0-9]{8}"
+                                title="Use apenas 8 dígitos numéricos"
+                                onblur="consultZipCode()"
+                            />
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="address">Rua (ou avenida)</label>
+                            <input class="form-control" type="text" id="address" required>
+                        </div>
+                        <div class="col-2">
+                            <label class="form-label" for="neighborhood">Bairro</label>
+                            <input class="form-control" type="text" id="neighborhood" required>
+                        </div>
+                        <div class="col-2">
+                            <label class="form-label" for="number">Número</label>
+                            <input class="form-control" type="text" id="number" required maxlength="10">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <label class="form-label" for="city">Cidade</label>
+                            <input class="form-control" type="text" id="city" required>
+                        </div>
+                        <div class="col-2">
+                            <label class="form-label" for="state">UF</label>
+                            <input class="form-control" type="text" id="state" required maxlength="2">
+                        </div>
+                        <div class="col-4">
+                            <label class="form-label" for="complement">Complemento</label>
+                            <input class="form-control" type="text" id="complement">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        <h6 class="card-title">Endereço</h6>
-                        <form>
-                            <div class="row mb-3">
-                                <div class="col-4">
-                                    <label class="form-label" for="cep">CEP</label>
-                                    <input
-                                        class="form-control"
-                                        type="text"
-                                        placeholder="Digite seu CEP (somente números)"
-                                        id="cep"
-                                        maxlength="8"
-                                        required
-                                        pattern="[0-9]{8}"
-                                        title="Use apenas 8 dígitos numéricos"
-                                        onblur="consultZipCode()"
-                                    />
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label" for="address">Rua (ou avenida)</label>
-                                    <input class="form-control" type="text" id="address" required>
-                                </div>
-                                <div class="col-2">
-                                    <label class="form-label" for="neighborhood">Bairro</label>
-                                    <input class="form-control" type="text" id="neighborhood" required>
-                                </div>
-                                <div class="col-2">
-                                    <label class="form-label" for="number">Número</label>
-                                    <input class="form-control" type="text" id="number" required maxlength="10">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-4">
-                                    <label class="form-label" for="city">Cidade</label>
-                                    <input class="form-control" type="text" id="city" required>
-                                </div>
-                                <div class="col-2">
-                                    <label class="form-label" for="state">UF</label>
-                                    <input class="form-control" type="text" id="state" required maxlength="2">
-                                </div>
-                                <div class="col-4">
-                                    <label class="form-label" for="complement">Complemento</label>
-                                    <input class="form-control" type="text" id="complement">
-                                </div>
-                            </div>
-                        </form>
+                        <p class="card-title">Cupons</p>
+                        <p class="card-subtitle text-muted">Adicione cupons de desconto às suas compras</p>
+                        <div class="form-group mt-3">
+                            <input class="form-control" type="text" id="coupon" placeholder="Digite o cupom">
+                        </div>
+                        <div class="text-end mt-3">
+                            <button type="button" class="btn btn-primary" onclick="validateCoupon()">Validar</button>
+                        </div>
                     </div>
                 </div>
+            </div>
+            <div class="col">
                 <div class="text-end">
                     <button type="button" class="btn btn-success mt-3" id="checkout-button" onclick="confirmOrder('{{ route('orders.store') }}', '{{ route('products.index') }}')" disabled>
                         Finalizar compra
@@ -105,6 +119,24 @@
 @endsection
 
 <script>
+    async function validateCoupon() {
+        const couponInput = document.getElementById('coupon');
+
+        const route = '{{ route('coupons.validate') }}';
+
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        const response = await fetch(route, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
+            body: JSON.stringify({
+                code: couponInput.value,
+            })
+        });
+
+        console.log(response);
+    }
+
     async function consultZipCode() {
         const cepInput = document.getElementById('cep');
         const addressInput = document.getElementById('address');

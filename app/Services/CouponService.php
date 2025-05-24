@@ -13,6 +13,11 @@ readonly class CouponService
         return Coupon::query()->paginate();
     }
 
+    public function findByCode(string $code): ?Coupon
+    {
+        return Coupon::query()->where('code', $code)->first();
+    }
+
     public function create(array $data): Coupon
     {
         return Coupon::query()->create($data);
