@@ -15,6 +15,8 @@ Route::prefix('coupons')->group(function () {
     Route::post('/', [CouponController::class, 'store'])->name('coupons.store');
 
     Route::post('/validate', [CouponController::class, 'validate'])->name('coupons.validate');
+
+    Route::delete('/{uuid}', [CouponController::class, 'destroy'])->name('coupons.destroy');
 });
 
 Route::prefix('products')->group(function () {

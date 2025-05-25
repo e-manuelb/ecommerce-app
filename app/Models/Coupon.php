@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Constants\DiscountType;
 use App\Traits\HasUUID;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -17,7 +18,7 @@ use NumberFormatter;
  * @property string $discount_type
  * @property bool $active
  * @property mixed $min_subtotal_to_apply
- * @property mixed $expires_at
+ * @property Carbon $expires_at
  * @property mixed $created_at
  * @property mixed $updated_at
  */

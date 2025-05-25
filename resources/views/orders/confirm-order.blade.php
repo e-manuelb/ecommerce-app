@@ -108,10 +108,13 @@
                 </div>
             </div>
             <div class="col">
-                <div class="text-end">
-                    <button type="button" class="btn btn-success mt-3" id="checkout-button" onclick="confirmOrder('{{ route('orders.store') }}', '{{ route('products.index') }}')" disabled>
-                        Finalizar compra
-                    </button>
+                <div class="card">
+                    <div class="card-body">
+                        <p class="card-title">Total</p>
+                        <p class="card-subtitle text-muted">Total da compra</p>
+                        <p>Subtotal: {{ CurrencyUtil::formatBRL($total) }}</p>
+                        <p>Descontos: </p>
+                    </div>
                 </div>
             </div>
         </div>

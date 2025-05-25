@@ -13,6 +13,12 @@ readonly class CouponService
         return Coupon::query()->paginate();
     }
 
+    public function findByUUID(string $uuid): ?Coupon
+    {
+        return Coupon::query()->where('uuid', $uuid)->first();
+
+    }
+
     public function findByCode(string $code): ?Coupon
     {
         return Coupon::query()->where('code', $code)->first();
@@ -21,5 +27,10 @@ readonly class CouponService
     public function create(array $data): Coupon
     {
         return Coupon::query()->create($data);
+    }
+
+    public function delete(Coupon $coupon): void
+    {
+        $coupon->delete();
     }
 }

@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\General;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\general\coupon\CreateCouponRequest;
+use App\Http\Requests\General\Coupon\CreateCouponRequest;
 use App\Services\CartService;
 use App\Services\CouponService;
-use http\Env\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -48,23 +47,43 @@ class CouponController extends Controller
             ], 400);
         }
 
-        if ($coupon->min_subtotal_to_apply <= $totalCart) {
+        if ($coupon->min_subtotal_to_apply > $totalCart) {
             return response()->json([
                 'message' => 'Coupon not valid for your shopping cart'
             ], 400);
         }
 
         return response()->json([
-            'message' => 'Coupon valid for your shopping cart'
+            'message' => 'Coupon valid for your shopping cart',
+            'data' => [
+                'code' => $coupon->code,
+                'discount' => $coupon->discount,
+                'discount_type' => $coupon->discount_type,
+            ]
         ]);
     }
 
     public function store(CreateCouponRequest $request): RedirectResponse
     {
-        $this->couponService->create($request->validated());
+        $data = $request->validated();
+
+        $data['active'] = intval($data['active']);
+
+        $this->couponService->create($data);
 
         return redirect()
             ->route('coupons.index')
             ->with('success', "Cupom criado com sucesso!");
+    }
+
+    public function destroy(string $uuid): JsonResponse
+    {
+        $coupon = $this->couponService->findByUUID($uuid);
+
+        $this->couponService->delete($coupon);
+
+        return response()->json([
+            'message' => 'Coupon removed successfully!'
+        ]);
     }
 }
