@@ -27,7 +27,6 @@
                   action="{{ route('products.add-to-cart', $product->uuid) }}"
                   method="POST"
                   style="display: none;">
-                @csrf
                 @method('POST')
             </form>
             <?php endif; ?>
@@ -80,7 +79,6 @@
                                           action="{{ route('product-variations.add-to-cart', $productVariation->uuid) }}"
                                           method="POST"
                                           style="display: none;">
-                                        @csrf
                                         @method('POST')
                                     </form>
                                 </div>

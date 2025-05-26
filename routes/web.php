@@ -8,6 +8,10 @@ use App\Http\Controllers\Product\ProductVariationController;
 use App\Models\Product;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', fn () => redirect(
+    \route('products.index')
+))->name('home');
+
 Route::prefix('coupons')->group(function () {
     Route::get('/', [CouponController::class, 'index'])->name('coupons.index');
 
@@ -52,5 +56,9 @@ Route::prefix('cart')->group(function () {
 
 Route::prefix('orders')->group(function () {
     Route::get('/confirm-order', [OrderController::class, 'confirmOrder'])->name('orders.confirm-order');
+    Route::get('/', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/', [OrderController::class, 'store'])->name('orders.store');
+
+    Route::get('/receipt/{uuid}', [OrderController::class, 'generateReceipt'])->name('orders.receipt');
+    Route::patch('/changeStatus/{uuid}', [OrderController::class, 'changeStatus'])->name('orders.change-status');
 });

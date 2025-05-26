@@ -4,8 +4,6 @@
 @section('content')
     <div class="container border p-4 bg-body-tertiary">
         <form action="{{ route('coupons.store') }}" method="POST">
-            @csrf
-
             <div class="row mb-3">
                 <div class="col">
                     <label for="code" class="form-label">Código</label>

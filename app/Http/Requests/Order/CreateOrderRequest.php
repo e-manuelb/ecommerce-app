@@ -9,6 +9,7 @@ class CreateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'coupons' => ['sometimes', 'array'],
             'address.zip_code' => ['required', 'string'],
             'address.street' => ['required', 'string'],
             'address.number' => ['required', 'string'],

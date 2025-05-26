@@ -4,6 +4,8 @@
 @section('content')
     <div class="container p-3 bg-body-tertiary">
         <p class="h3 mb-3">Finalizar pedido</p>
+
+        {{-- Tabela de Produtos --}}
         <div class="mb-3">
             <div class="card">
                 <div class="card-body">
@@ -43,6 +45,8 @@
                 </div>
             </div>
         </div>
+
+        {{-- Endereço --}}
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title">Endereço</h6>
@@ -50,17 +54,9 @@
                     <div class="row mb-3">
                         <div class="col-4">
                             <label class="form-label" for="cep">CEP</label>
-                            <input
-                                class="form-control"
-                                type="text"
-                                placeholder="Digite seu CEP (somente números)"
-                                id="cep"
-                                maxlength="8"
-                                required
-                                pattern="[0-9]{8}"
-                                title="Use apenas 8 dígitos numéricos"
-                                onblur="consultZipCode()"
-                            />
+                            <input class="form-control" type="text" placeholder="Digite seu CEP (somente números)" id="cep"
+                                   maxlength="8" required pattern="[0-9]{8}" title="Use apenas 8 dígitos numéricos"
+                                   onblur="consultZipCode()" />
                         </div>
                         <div class="col-4">
                             <label class="form-label" for="address">Rua (ou avenida)</label>
@@ -92,6 +88,8 @@
                 </form>
             </div>
         </div>
+
+        {{-- Cupons e Total --}}
         <div class="row mt-3">
             <div class="col">
                 <div class="card">
@@ -100,6 +98,8 @@
                         <p class="card-subtitle text-muted">Adicione cupons de desconto às suas compras</p>
                         <div class="form-group mt-3">
                             <input class="form-control" type="text" id="coupon" placeholder="Digite o cupom">
+                            <div id="coupon-feedback" class="form-text mt-1" style="display: none;"></div>
+                            <div id="applied-coupons" class="d-flex flex-wrap gap-2 mt-2"></div>
                         </div>
                         <div class="text-end mt-3">
                             <button type="button" class="btn btn-primary" onclick="validateCoupon()">Validar</button>
@@ -107,13 +107,27 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Total --}}
             <div class="col">
                 <div class="card">
                     <div class="card-body">
-                        <p class="card-title">Total</p>
-                        <p class="card-subtitle text-muted">Total da compra</p>
-                        <p>Subtotal: {{ CurrencyUtil::formatBRL($total) }}</p>
-                        <p>Descontos: </p>
+                        <p class="card-title">Resumo</p>
+                        <p class="card-subtitle text-muted">Subtotal: <span id="subtotal-value">{{ CurrencyUtil::formatBRL($total) }}</span></p>
+                        <div id="discount-container" style="display: none;">
+                            <p class="card-subtitle text-muted">Descontos: <span id="discount-value">{{ CurrencyUtil::formatBRL(0) }}</span></p>
+                        </div>
+                        <div class="mt-3">
+                            <button
+                                type="button"
+                                class="btn btn-success"
+                                onclick="confirmOrder('{{ route('orders.store') }}', '{{ route('products.index') }}')"
+                                id="confirm-order-btn"
+                                disabled
+                            >
+                                Confirmar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,22 +136,74 @@
 @endsection
 
 <script>
+    const subtotal = <?php echo $total ?>;
+    let appliedCoupons = [];
+    let appliedDiscounts = [];
+
     async function validateCoupon() {
         const couponInput = document.getElementById('coupon');
+        const feedback = document.getElementById('coupon-feedback');
+        const appliedContainer = document.getElementById('applied-coupons');
+
+        const code = couponInput.value.trim().toUpperCase();
+        if (!code) return;
+
+        if (appliedCoupons.includes(code)) {
+            feedback.textContent = `O cupom "${code}" já foi adicionado.`;
+            feedback.style.display = 'block';
+            feedback.classList.remove('text-success');
+            feedback.classList.add('text-danger');
+            return;
+        }
 
         const route = '{{ route('coupons.validate') }}';
 
-        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        try {
+            const response = await axios.post(route, { code }, {
+                headers: { 'Content-Type': 'application/json' },
+            });
 
-        const response = await fetch(route, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token },
-            body: JSON.stringify({
-                code: couponInput.value,
-            })
+            const data = response.data.data;
+
+            feedback.textContent = `Cupom "${data.code}" aplicado com sucesso!`;
+            feedback.style.display = 'block';
+            feedback.classList.remove('text-danger');
+            feedback.classList.add('text-success');
+
+            appliedCoupons.push(data.code.toUpperCase());
+
+            let discount = 0;
+            if (data.discount_type === 'PERCENTAGE') {
+                discount = subtotal * (data.discount / 100);
+            } else {
+                discount = data.discount;
+            }
+            appliedDiscounts.push(discount);
+
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-success text-white';
+            badge.textContent = data.code.toUpperCase();
+            appliedContainer.appendChild(badge);
+
+            const totalDiscount = appliedDiscounts.reduce((acc, val) => acc + val, 0);
+            document.getElementById('discount-value').textContent = formatCurrency(totalDiscount);
+            document.getElementById('discount-container').style.display = 'block';
+
+            couponInput.value = '';
+        } catch (err) {
+            feedback.textContent = 'Cupom inválido.';
+            feedback.style.display = 'block';
+            feedback.classList.remove('text-success');
+            feedback.classList.add('text-danger');
+        }
+    }
+
+    function formatCurrency(value) {
+        return value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2
         });
-
-        console.log(response);
     }
 
     async function consultZipCode() {
@@ -147,10 +213,10 @@
         const cityInput = document.getElementById('city');
         const stateInput = document.getElementById('state');
         const complementInput = document.getElementById('complement');
-        const checkoutButton = document.getElementById('checkout-button');
+        const confirmOrderButton = document.getElementById('confirm-order-btn');
 
         cepInput.setCustomValidity('');
-        checkoutButton.disabled = true;
+        if (confirmOrderButton) confirmOrderButton.disabled = true;
 
         const cep = cepInput.value.trim();
 
@@ -161,11 +227,8 @@
         }
 
         try {
-            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-
-            if (!response.ok) throw new Error('Erro na requisição');
-
-            const data = await response.json();
+            const response = await axios.get(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = response.data;
 
             if (data.erro) throw new Error('CEP não encontrado');
 
@@ -175,8 +238,7 @@
             stateInput.value = data.uf || '';
             complementInput.value = data.complemento || '';
 
-            checkoutButton.disabled = false;
-
+            if (confirmOrderButton) confirmOrderButton.disabled = false;
         } catch (err) {
             Swal.fire('Erro', err.message, 'error');
         }
@@ -192,28 +254,26 @@
         const numberInput = document.getElementById('number');
 
         try {
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            const response = await fetch(route, {
-                method: 'POST',
-                headers: { 'accept': 'application/json', 'content-type': 'application/json', 'X-CSRF-TOKEN': token },
-                body: JSON.stringify({
-                    address: {
-                        zip_code: cepInput.value,
-                        street: addressInput.value,
-                        number: numberInput.value,
-                        complement: complementInput.value,
-                        neighborhood: neighborhoodInput.value ?? '',
-                        city: cityInput.value,
-                        state: stateInput.value
-                    },
-                })
+            const response = await axios.post(route, {
+                coupons: appliedCoupons,
+                address: {
+                    zip_code: cepInput.value,
+                    street: addressInput.value,
+                    number: numberInput.value,
+                    complement: complementInput.value,
+                    neighborhood: neighborhoodInput.value ?? '',
+                    city: cityInput.value,
+                    state: stateInput.value
+                }
+            }, {
+                headers: { 'Content-Type': 'application/json' },
             });
 
-            if (!response.ok) throw new Error('Erro na requisição');
-
-            if (response.status === 200) {
-                Swal.fire('Sucesso', 'Pedido criado com sucesso', 'success').then(() => window.location.href = redirectRoute);
+            if (response.status === 201) {
+                Swal.fire('Sucesso', 'Pedido criado com sucesso', 'success')
+                    .then(() => window.location.href = redirectRoute);
+            } else {
+                throw new Error('Erro na requisição');
             }
         } catch (err) {
             Swal.fire('Erro', err.message, 'error');

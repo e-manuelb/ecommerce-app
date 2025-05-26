@@ -12,7 +12,6 @@
                 @method("PUT")
             @endif
 
-            @csrf
             <div class="row mb-3">
                 <div class="col">
                     <label for="code" class="form-label">Nome</label>

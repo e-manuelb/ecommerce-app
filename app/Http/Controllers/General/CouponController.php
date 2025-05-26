@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\General\Coupon\CreateCouponRequest;
 use App\Services\CartService;
 use App\Services\CouponService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -44,6 +45,20 @@ class CouponController extends Controller
         if (!$coupon) {
             return response()->json([
                 'message' => 'Invalid coupon code.'
+            ], 400);
+        }
+
+        if (!$coupon->active) {
+            return response()->json([
+                'message' => 'Inactive coupon code.'
+            ], 400);
+        }
+
+        $expiresAt = Carbon::createFromFormat('Y-m-d H:i:s', $coupon->expires_at);
+
+        if ($expiresAt->isBefore(now())) {
+            return response()->json([
+                'message' => 'Expired coupon code.'
             ], 400);
         }
 

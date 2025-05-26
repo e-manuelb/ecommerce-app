@@ -10,6 +10,7 @@ use App\Models\ProductVariation;
 use App\Services\CartService;
 use App\Services\ProductVariationService;
 use App\Services\StockService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -81,14 +82,20 @@ class ProductVariationController extends Controller
             ->with('success', "Produto criado com sucesso!");
     }
 
-    public function destroy(String $uuid): RedirectResponse
+    public function destroy(String $uuid): JsonResponse
     {
         $productVariation = $this->productVariationService->findByUUID($uuid);
 
+        if (!$productVariation) {
+            return response()->json([
+               'message' => 'Produto não encontrado!'
+            ], 400);
+        }
+
         $this->productVariationService->delete($productVariation);
 
-        return redirect()
-            ->route('product-variations.index')
-            ->with('success', "Produto removido com sucesso!");
+        return response()->json([
+            'message' => 'Produto removido com sucesso!'
+        ]);
     }
 }

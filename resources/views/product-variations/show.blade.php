@@ -18,7 +18,6 @@
                   action="{{ route('product-variations.add-to-cart', $productVariation->uuid) }}"
                   method="POST"
                   style="display: none;">
-                @csrf
                 @method('POST')
             </form>
         </div>

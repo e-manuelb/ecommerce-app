@@ -9,6 +9,7 @@ use App\Http\Requests\Product\UpdateProductRequest;
 use App\Services\CartService;
 use App\Services\ProductService;
 use App\Services\StockService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -79,14 +80,20 @@ class ProductController extends Controller
             ->with('success', "Produto atualizado com sucesso!");
     }
 
-    public function destroy(String $uuid): RedirectResponse
+    public function destroy(String $uuid): JsonResponse
     {
         $product = $this->productService->findByUUID($uuid);
 
+        if (!$product) {
+            return response()->json([
+               'message' => 'Produto não encontrado!'
+            ], 400);
+        }
+
         $this->productService->delete($product);
 
-        return redirect()
-            ->route('products.index')
-            ->with('success', "Produto removido com sucesso!");
+        return response()->json([
+            'message' => 'Produto removido com sucesso!'
+        ]);
     }
 }

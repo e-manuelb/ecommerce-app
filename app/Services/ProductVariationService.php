@@ -28,7 +28,7 @@ readonly class ProductVariationService
         return ProductVariation::query()->create($data);
     }
 
-    public function findByUUID(string $uuid): ProductVariation
+    public function findByUUID(string $uuid): ?ProductVariation
     {
         return ProductVariation::query()->where('uuid', $uuid)->first();
     }

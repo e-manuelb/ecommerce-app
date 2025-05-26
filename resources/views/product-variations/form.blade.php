@@ -12,8 +12,6 @@
         <form
                 action="{{ $hasProductVariation ? route('product-variations.update', $productVariation->uuid) : route('product-variations.store') }}"
                 method="POST">
-            @csrf
-
             @if($hasProductVariation)
                 @method("PUT")
             @endif

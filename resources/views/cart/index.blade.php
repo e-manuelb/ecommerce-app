@@ -7,7 +7,7 @@
 
         @if(count($items) == 0)
             <div class="text-center align-middle p-3">
-                <p class="h4">Não há items no carrinho.</p>
+                <p class="h4">Não há itens no carrinho.</p>
             </div>
         @else
             <div>
@@ -117,36 +117,6 @@
     </div>
 @endsection
 <script>
-    async function consultZipCode() {
-        const cepInput = document.getElementById('cep');
-
-        cepInput.setCustomValidity('');
-
-        const cep = cepInput.value.trim();
-
-        if (!/^[0-9]{8}$/.test(cep)) {
-            cepInput.setCustomValidity('Informe 8 dígitos numéricos. Ex: 61814004');
-            cepInput.reportValidity();
-            return;
-        }
-
-        try {
-            const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-
-            if (!response.ok) {
-                throw new Error('Erro na requisição');
-            }
-
-            const data = await response.json();
-
-            if (data.erro) {
-                throw new Error('CEP não encontrado');
-            }
-        } catch (err) {
-            Swal.fire('Erro', err.message, 'error');
-        }
-    }
-
     async function confirmRemove(route, button) {
         const result = await Swal.fire({
             title: 'Tem certeza?',
@@ -162,20 +132,14 @@
         if (!result.isConfirmed) return;
 
         try {
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            const res = await fetch(route, {
-                method: 'DELETE',
+            const response = await axios.delete(route, {
                 headers: {
-                    'X-CSRF-TOKEN': token,
                     'Accept': 'application/json',
-                },
-            });
+                }
+            })
 
-            if (!res.ok) {
-                const err = await res.json().catch(() => null);
-
-                throw new Error(err?.message || 'Erro ao remover do carrinho');
+            if (response.status !== 200) {
+                throw new Error('Erro ao remover do carrinho');
             }
 
             button.closest('tr').remove();
@@ -188,25 +152,18 @@
 
     async function changeQuantity(route, uuid, quantity) {
         try {
-            const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-            const response = await fetch(route, {
-                method: 'PUT',
+            const response = await axios.put(route, {
+                product_uuid: uuid,
+                quantity: quantity,
+            }, {
                 headers: {
-                    'X-CSRF-TOKEN': token,
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    product_uuid: uuid,
-                    quantity: quantity,
-                })
-            });
+                }
+            })
 
-            if (!response.ok) {
-                const err = await response.json().catch(() => null);
-
-                throw new Error(err?.message || 'Erro ao remover do carrinho');
+            if (response.status !== 200) {
+                throw new Error(err?.message || 'Erro ao alterar a quantidade do produto');
             }
 
             Swal.fire('Alterado!', 'Quantidade alterada com sucesso.', 'success').then(() => window.location.reload());
